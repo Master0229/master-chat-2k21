@@ -87,9 +87,9 @@ socket.on('image', image => {
         div1.appendChild(div2)
         document.getElementById('messagelist').append(div1)
         console.log(recieveimgsize(image.imageurl))
-        window.setInterval(function() {
+        window.setInterval(function () {
             scrolltobottom()
-          }, 100);
+        }, 100);
     }
 })
 function recieveimgsize(imageUrl) {
@@ -122,7 +122,7 @@ function keyevent(e) {
     console.log(e)
 }
 function sendmessage() {
-    if ($('#message').val())
+    if ($('#message').val().trimStart())
         socket.emit('sendMessage', $('#message').val(), () => {
             var div1 = document.createElement('div')
             var div2 = document.createElement('div')
@@ -143,6 +143,8 @@ function sendmessage() {
             $('#message').focus()
             scrolltobottom()
         });
+    else
+        $('#message').val('')
 }
 function gettime() {
     var time = ''
@@ -204,7 +206,7 @@ function loadFile(event) {
             $('#message').focus()
             window.setInterval(function () {
                 scrolltobottom()
-            }, 100); 
+            }, 100);
         });
     };
     reader.readAsDataURL(event.target.files[0]);
