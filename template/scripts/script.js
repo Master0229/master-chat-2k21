@@ -26,7 +26,7 @@ socket.on('message', message => {
     var mtext = document.createElement('span')
     var strong = document.createElement('strong')
     var br = document.createElement('br')
-
+    console.log(message.user, $('#name').val())
     if (message.user == "admin") {
         div1.className = "chat_bot_msg"
         div2.className = "received_msg justify-content-center d-flex"
@@ -54,9 +54,13 @@ socket.on('message', message => {
         document.getElementById('messagelist').append(div1)
         // document.getElementById('messagelist').append(br)
     }
+    scrolltobottom()
 });
-
+function scrolltobottom() {
+    document.getElementById('message_box').scrollTop = document.getElementById('message_box').scrollHeight
+}
 socket.on('image', image => {
+    // console.log(image)
     var div1 = document.createElement('div')
     var div2 = document.createElement('div')
     var p = document.createElement('p')
@@ -82,8 +86,24 @@ socket.on('image', image => {
         div2.appendChild(p)
         div1.appendChild(div2)
         document.getElementById('messagelist').append(div1)
+        console.log(recieveimgsize(image.imageurl))
+        window.setInterval(function() {
+            scrolltobottom()
+          }, 100);
     }
 })
+function recieveimgsize(imageUrl) {
+    var blob = null;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', imageUrl, true);
+    xhr.responseType = 'blob';
+    xhr.onload = function () {
+        blob = xhr.response;
+        console.log(blob, blob.size);
+        console.log(bytesToSize(blob.size / 2))
+    }
+    xhr.send();
+}
 function setname(value) {
     name = value
 }
@@ -121,6 +141,7 @@ function sendmessage() {
             document.getElementById('messagelist').append(div1)
             $('#message').val('')
             $('#message').focus()
+            scrolltobottom()
         });
 }
 function gettime() {
@@ -145,13 +166,20 @@ const emojiTrigger = new FgEmojiPicker({
         $('#message').val($('#message').val() + obj.emoji)
     }
 });
-
+function bytesToSize(bytes) {
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes == 0) return '0 Byte';
+    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+    return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+}
 ////////IMAGE PICKER///////
 function loadFile(event) {
     // console.log(URL.createObjectURL(event.target.files[0]));
     // console.log(event.target.files[0]);
     var reader = new FileReader();
     reader.onload = function (evt) {
+        console.log(event.target.files[0].size)
+        console.log("Sent Img Size :", bytesToSize(event.target.files[0].size))
         socket.emit('sendimage', evt.target.result, () => {
             var div1 = document.createElement('div')
             var div2 = document.createElement('div')
@@ -174,6 +202,9 @@ function loadFile(event) {
             document.getElementById('messagelist').append(div1)
             $('#message').val('')
             $('#message').focus()
+            window.setInterval(function () {
+                scrolltobottom()
+            }, 100); 
         });
     };
     reader.readAsDataURL(event.target.files[0]);
