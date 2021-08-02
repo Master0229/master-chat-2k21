@@ -57,6 +57,7 @@ socket.on('message', message => {
     scrolltobottom()
 });
 function scrolltobottom() {
+    console.log("Scrolling bottom")
     document.getElementById('message_box').scrollTop = document.getElementById('message_box').scrollHeight
 }
 socket.on('image', image => {
@@ -87,8 +88,9 @@ socket.on('image', image => {
         div1.appendChild(div2)
         document.getElementById('messagelist').append(div1)
         console.log(recieveimgsize(image.imageurl))
-        window.setInterval(function () {
+        let intervalid = window.setInterval(function () {
             scrolltobottom()
+            window.clearInterval(intervalid)
         }, 100);
     }
 })
@@ -204,8 +206,9 @@ function loadFile(event) {
             document.getElementById('messagelist').append(div1)
             $('#message').val('')
             $('#message').focus()
-            window.setInterval(function () {
+            let intervalid = window.setInterval(function () {
                 scrolltobottom()
+                window.clearInterval(intervalid)
             }, 100);
         });
     };
